@@ -67,19 +67,41 @@
     			.setContent("You clicked the map at " + lat + ", " + lng)
     			.openOn(mymap);
         console.log(lat, lng)
-        addData()
+        $.getJSON( " http://104.236.108.140:3000/licenses/39.952398/-75.162206", function( data ) {
+          console.log('data', data)
+          var items = [];
+          var headers = [
+            'license_id',
+            'source_system',
+            'call_sign',
+            'radio_service_code',
+            'radio_service_description',
+            'rollup_status_description',
+            'lic_address',
+            'lic_city',
+            'contact_company',
+            'ant_type_desc'
+          ]
+          $.each( data, function( obj ) {
+            for(var x = 0; x < headers.length; x++) {
+              items.push(obj[headers[x]])
+            }
+          });
+          addData(items)
+        });
     	}
 
     	mymap.on('click', onMapClick);
-      function addData() {
+      function addData(items) {
+        // var items = [
+        //   ["Sitepoint","http://sitepoint.com","Blog","2013-10-15 10:30:00"],
+        //   ["Flippa","http://flippa.com","Marketplace","null"],
+        //   ["99designs","http://99designs.com","Marketplace","null"],
+        //   ["Learnable","http://learnable.com","Online courses","null"],
+        //   ["Rubysource","http://rubysource.com","Blog","2013-01-10 12:00:00"]
+        // ]
         $("#example").dataTable({
-          "aaData":[
-            ["Sitepoint","http://sitepoint.com","Blog","2013-10-15 10:30:00"],
-            ["Flippa","http://flippa.com","Marketplace","null"],
-            ["99designs","http://99designs.com","Marketplace","null"],
-            ["Learnable","http://learnable.com","Online courses","null"],
-            ["Rubysource","http://rubysource.com","Blog","2013-01-10 12:00:00"]
-          ],
+          "aaData": items,
           "aoColumnDefs":[{
                 "sTitle":"Site name"
               , "aTargets": [ "site_name" ]
