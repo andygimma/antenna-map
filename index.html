@@ -16,9 +16,7 @@
       crossorigin=""></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-
-
-
+    <link rel="stylesheet" type="text/css" href="game.css">
   </head>
   <body>
     <div class="row marketing">
@@ -41,10 +39,29 @@
           <tbody>
           </tbody>
         </table>
+        <div id="game">
+          <div id="userSelection">
+           <h1>Rock Paper Scissors!</h1>
+           <h2>Select your choice</h2>
+             <ul>
+          <li class="selection" id="stone">
+            <img src="stone.png" alt="Stone" onclick="playWith('stone')"/>
+          </li>
+          <li class="selection" id="paper">
+            <img src="paper.png" alt="Paper" onclick="playWith('paper')"/>
+          </li>
+          <li class="selection" id="scissor">
+            <img src="scissor.png" alt="Scisor" onclick="playWith('scissor')"/>
+          </li>
+             </ul>
+             <button onclick="playGame()">Play</button>
+          </div>
+          <div id="result"></div>
+        </div>
       </div>
     </div>
     <script>
-
+      $("#game").hide();
     	var mymap = L.map('mapid').setView([40.650002, -73.949997], 10);
 
     	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -98,7 +115,12 @@
         });
       }
       function searchByLatLng(lat, lng) {
+        $("#example").hide();
+        $("#game").show();
+
         $.getJSON( " http://104.236.108.140:3000/licenses/" + lat + "/" + lng, function( data ) {
+          $("#example").show();
+          $("#game").hide();
           var items = [];
           var headers = [
             'license_id',
@@ -126,6 +148,81 @@
           addData(items)
         });
       }
+    </script>
+    <script>
+    var userOption = undefined;
+    function playWith(option){
+       // first, we deselect the previous selected element (if exist)
+       if (userOption != undefined)
+       {
+          userSelectionElement = document.getElementById(userOption);
+          // we remove the purple border (if exist)
+          userSelectionElement.style.border = "5px #F8F8F8  solid";
+       }
+       // then, we select the user option and we add
+       // a purple border
+       userOption = option;
+       userSelectionElement = document.getElementById(option);
+       userSelectionElement.style.border = "5px #990066 solid";
+    }
+    function playGame(){
+      var computerOption = Math.random();
+      if (computerOption <0.34){
+      computerOption = "stone";
+      }else if(computerOption <=0.67){
+      computerOption = "paper";
+      }else{
+      computerOption = "scissor";
+      }
+
+      resultMessage = compare(userOption, computerOption);
+
+      document.getElementById("result").innerHTML =
+      "<br><br><br><br><h4>User select: " + userOption + " - Computer select:"
+      + computerOption + "</h4> <h2>" + resultMessage + "</h2>";
+
+    }
+
+    function compare(userSelection, computerSelection)
+		{
+			if(userSelection == undefined)
+			{
+				return "Please, select an option before play"
+			}
+
+		    if (userSelection == computerSelection)
+		    {
+		       return "It is a draw!";
+		    }
+
+		    if (userSelection == "stone")
+		    {
+		        if (computerSelection == "scissor")
+		        {
+		             return "You win!";
+		        } else {
+		            return "The computer wins. Try again.";
+		        }
+
+		    } else if (userSelection == "paper") {
+
+		        if (computerSelection == "stone")
+		        {
+		             return "You win!" ;
+		        } else if("scissor") {
+		            return "The computer wins. Try again." ;
+		        }
+
+		    } else if (userSelection == "scissor") {
+
+		        if (computerSelection == "stone")
+		        {
+		            return "The computer wins. Try again.";
+		        }else{
+		            return "You win!";
+		        }
+		    }
+		}
     </script>
   </body>
 </html>
