@@ -24,11 +24,11 @@
     <div class="row marketing">
       <div class="col-lg-3">
         <h2>Search</h2>
-        <form>
+        <form id="search-form">
           <div class="form-group">
             <input type="text" class="form-control" id="address" aria-describedby="address" placeholder="Enter address">
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" id="submit" class="btn btn-primary">Submit</button>
         </form>
         <div id="mapid" style="height:500px;"></div>
       </div>
@@ -57,6 +57,23 @@
 
     	var popup = L.popup();
 
+      $('#search-form').submit(function(e) {
+        e.preventDefault();
+        var searchTerm = $("#address").val()
+        var url = "http://locationiq.org/v1/search.php?key=9634ff5d4790e3&format=json&q=" + searchTerm
+        $.getJSON( url, function( data ) {
+          console.log(data)
+          var lat = data[0].lat
+          var lon = data[0].lon
+          popup
+            .setLatLng({'lat': lat, 'lng': lon})
+            .setContent("Searching at " + lat + ", " + lon)
+            .openOn(mymap);
+          searchByLatLng(lat, lon)
+
+        })
+      })
+
     	function onMapClick(e) {
         var lat = e.latlng.lat
         var lng = e.latlng.lng
@@ -65,33 +82,7 @@
     			.setLatLng(e.latlng)
     			.setContent("You clicked the map at " + lat + ", " + lng)
     			.openOn(mymap);
-        $.getJSON( " http://104.236.108.140:3000/licenses/" + lat + "/" + lng, function( data ) {
-          var items = [];
-          var headers = [
-            'license_id',
-            'source_system',
-            'call_sign',
-            'radio_service_description',
-            'rollup_status_description',
-            'lic_address',
-            'lic_city',
-            'contact_company',
-            'ant_type_desc'
-          ]
-
-          for (var x = 0; x < data.data.length; x++) {
-            var row = []
-            row.push(data.data[x].license_id)
-            row.push(data.data[x].source_system)
-            row.push(data.data[x].lic_address)
-            row.push(data.data[x].lic_city)
-            row.push(data.data[x].contact_company)
-            row.push(data.data[x].ant_type_desc)
-            items.push(row)
-          }
-
-          addData(items)
-        });
+        searchByLatLng(lat, lng)
     	}
 
     	mymap.on('click', onMapClick);
@@ -120,6 +111,35 @@
           //     }
           // }
           ]
+        });
+      }
+      function searchByLatLng(lat, lng) {
+        $.getJSON( " http://104.236.108.140:3000/licenses/" + lat + "/" + lng, function( data ) {
+          var items = [];
+          var headers = [
+            'license_id',
+            'source_system',
+            'call_sign',
+            'radio_service_description',
+            'rollup_status_description',
+            'lic_address',
+            'lic_city',
+            'contact_company',
+            'ant_type_desc'
+          ]
+
+          for (var x = 0; x < data.data.length; x++) {
+            var row = []
+            row.push(data.data[x].license_id)
+            row.push(data.data[x].source_system)
+            row.push(data.data[x].lic_address)
+            row.push(data.data[x].lic_city)
+            row.push(data.data[x].contact_company)
+            row.push(data.data[x].ant_type_desc)
+            items.push(row)
+          }
+
+          addData(items)
         });
       }
     </script>
