@@ -36,7 +36,7 @@
         <h2>Table</h2>
         <table id="example">
           <thead>
-            <tr><th class="site_name">License ID</th><th>Source System</th><th>Call Sign</th><th>Radio Service</th><th>Rollup Status</th><th>Address</th><th>City</th><th>Company</th><th>Antennae</th></tr>
+            <tr><th class="site_name">License ID</th><th>Source System</th><th>Address</th><th>City</th><th>Company</th><th>Antennae</th></tr>
           </thead>
           <tbody>
           </tbody>
@@ -58,8 +58,6 @@
     	var popup = L.popup();
 
     	function onMapClick(e) {
-        $("#example thbody").remove()
-
         var lat = e.latlng.lat
         var lng = e.latlng.lng
 
@@ -85,15 +83,10 @@
             var row = []
             row.push(data.data[x].license_id)
             row.push(data.data[x].source_system)
-            row.push(data.data[x].call_sign)
-            row.push(data.data[x].radio_service_description)
-            row.push(data.data[x].rollup_status_description)
             row.push(data.data[x].lic_address)
             row.push(data.data[x].lic_city)
             row.push(data.data[x].contact_company)
             row.push(data.data[x].ant_type_desc)
-            console.log('x', data.data[x].license_id)
-            console.log('row', row)
             items.push(row)
           }
 
@@ -104,6 +97,7 @@
     	mymap.on('click', onMapClick);
       function addData(items) {
         $("#example").dataTable({
+          destroy: true,
           "aaData": items,
           "aoColumnDefs":[{
                 "sTitle":"License ID"
