@@ -14,7 +14,6 @@
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
       integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
       crossorigin=""></script>
-    <link rel="stylesheet" type="text/css" href="styles.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
@@ -31,13 +30,13 @@
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
-        <div id="mapid"></div>
+        <div id="mapid" style="height:500px;"></div>
       </div>
       <div class="col-lg-9">
         <h2>Table</h2>
         <table id="example">
           <thead>
-            <tr><th class="site_name">License ID</th><th>Source System</th><th>Radio Service</th><th>Rollup Status</th><th>Address</th><th>City</th><th>Company</th><th>Antennae</th></tr>
+            <tr><th class="site_name">License ID</th><th>Source System</th><th>Call Sign</th><th>Radio Service</th><th>Rollup Status</th><th>Address</th><th>City</th><th>Company</th><th>Antennae</th></tr>
           </thead>
           <tbody>
           </tbody>
@@ -59,6 +58,8 @@
     	var popup = L.popup();
 
     	function onMapClick(e) {
+        $("#example thbody").remove()
+
         var lat = e.latlng.lat
         var lng = e.latlng.lng
 
@@ -66,7 +67,7 @@
     			.setLatLng(e.latlng)
     			.setContent("You clicked the map at " + lat + ", " + lng)
     			.openOn(mymap);
-        $.getJSON( " http://104.236.108.140:3000/licenses/39.952398/-75.162206", function( data ) {
+        $.getJSON( " http://104.236.108.140:3000/licenses/" + lat + "/" + lng, function( data ) {
           var items = [];
           var headers = [
             'license_id',
@@ -79,30 +80,29 @@
             'contact_company',
             'ant_type_desc'
           ]
-          console.log(data)
-          $.each( data.data, function( obj ) {
-            for(var x = 0; x < headers.length; x++) {
-              var row = []
-              if (data[headers[x]]) {
-                row.push(val)
-              }
-              items.push(row)
-            }
-          });
+
+          for (var x = 0; x < data.data.length; x++) {
+            var row = []
+            row.push(data.data[x].license_id)
+            row.push(data.data[x].source_system)
+            row.push(data.data[x].call_sign)
+            row.push(data.data[x].radio_service_description)
+            row.push(data.data[x].rollup_status_description)
+            row.push(data.data[x].lic_address)
+            row.push(data.data[x].lic_city)
+            row.push(data.data[x].contact_company)
+            row.push(data.data[x].ant_type_desc)
+            console.log('x', data.data[x].license_id)
+            console.log('row', row)
+            items.push(row)
+          }
+
           addData(items)
         });
     	}
 
     	mymap.on('click', onMapClick);
       function addData(items) {
-        console.log(items)
-        // var items = [
-        //   ["Sitepoint","http://sitepoint.com","Blog","2013-10-15 10:30:00"],
-        //   ["Flippa","http://flippa.com","Marketplace","null"],
-        //   ["99designs","http://99designs.com","Marketplace","null"],
-        //   ["Learnable","http://learnable.com","Online courses","null"],
-        //   ["Rubysource","http://rubysource.com","Blog","2013-01-10 12:00:00"]
-        // ]
         $("#example").dataTable({
           "aaData": items,
           "aoColumnDefs":[{
