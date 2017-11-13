@@ -7,103 +7,83 @@
 
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
-      integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
-      crossorigin=""/>
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
-      integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
-      crossorigin=""></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Libre+Barcode+39+Text" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="game.css">
   </head>
+  <style>
+  body{
+    background:black;
+      color: white;
+      font-family: 'PT Sans', sans-serif;
+      letter-spacing: 0.15em;
+       text-transform: uppercase;
+
+  }
+    .row.marketing{
+      width:90%;
+      margin:auto;
+    }
+    #example{
+      width:100%;
+      color: white;
+      font-family: 'PT Sans', sans-serif;
+      letter-spacing: 0.15em;
+
+    }
+    .loading{
+      width:90%;
+      margin:50px auto;
+      text-align: center;
+
+    }
+    h2{
+      text-align: center;
+      color:white;
+      font-size: 45px;
+      font-family: 'Libre Barcode 39 Text', cursive;
+
+    }
+    table.dataTable tbody tr {
+    background-color: black;
+    color: white;
+    font-family: 'PT Sans', sans-serif;
+    letter-spacing: 0.15em;
+
+  }
+  </style>
   <body>
+    <h2>FCC licenses near you</h2>
+    <div class="loading">
+      <img src="Infinity.gif" alt="">
+    </div>
     <div class="row marketing">
-      <div class="col-lg-3">
-        <h2>Search</h2>
-        <form id="search-form">
-          <div class="form-group">
-            <input type="text" class="form-control" id="address" aria-describedby="address" placeholder="Enter address">
-          </div>
-          <button type="submit" id="submit" class="btn btn-primary">Submit</button>
-        </form>
-        <div id="mapid" style="height:500px;"></div>
-      </div>
-      <div class="col-lg-9">
-        <h2>Table</h2>
+      <div class="col-lg-12">
+  
+
         <table id="example">
           <thead>
-            <tr><th class="site_name">License ID</th><th>Source System</th><th>Address</th><th>City</th><th>Company</th><th>Antennae</th></tr>
+            <tr>
+              <th>License Holdr</th>
+              <th>Desc</th>
+              <th>Catgry</th>
+              <th>Frequency</th>
+            </tr>
           </thead>
           <tbody>
           </tbody>
         </table>
-        <div id="game">
-          <div id="userSelection">
-           <h1>Rock Paper Scissors!</h1>
-           <h2>Select your choice</h2>
-             <ul>
-          <li class="selection" id="stone">
-            <img src="stone.png" alt="Stone" onclick="playWith('stone')"/>
-          </li>
-          <li class="selection" id="paper">
-            <img src="paper.png" alt="Paper" onclick="playWith('paper')"/>
-          </li>
-          <li class="selection" id="scissor">
-            <img src="scissor.png" alt="Scisor" onclick="playWith('scissor')"/>
-          </li>
-             </ul>
-             <button onclick="playGame()">Play</button>
-          </div>
-          <div id="result"></div>
-        </div>
       </div>
     </div>
     <script>
-      $("#game").hide();
-    	var mymap = L.map('mapid').setView([40.650002, -73.949997], 10);
 
-    	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-    		maxZoom: 18,
-    		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-    			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    		id: 'mapbox.streets'
-    	}).addTo(mymap);
-
-    	var popup = L.popup();
-
-      $('#search-form').submit(function(e) {
-        e.preventDefault();
-        var searchTerm = $("#address").val()
-        var url = "http://locationiq.org/v1/search.php?key=9634ff5d4790e3&format=json&q=" + searchTerm
-        $.getJSON( url, function( data ) {
-          console.log(data)
-          var lat = data[0].lat
-          var lon = data[0].lon
-          popup
-            .setLatLng({'lat': lat, 'lng': lon})
-            .setContent("Searching at " + lat + ", " + lon)
-            .openOn(mymap);
-          searchByLatLng(lat, lon)
-
-        })
-      })
-
-    	function onMapClick(e) {
-        var lat = e.latlng.lat
-        var lng = e.latlng.lng
-
-    		popup
-    			.setLatLng(e.latlng)
-    			.setContent("You clicked the map at " + lat + ", " + lng)
-    			.openOn(mymap);
-        searchByLatLng(lat, lng)
-    	}
-
-    	mymap.on('click', onMapClick);
+      $("#example").hide();
+      $(".loading").hide();
       function addData(items) {
+        $(".loading").hide();
         $("#example").dataTable({
           destroy: true,
           "aaData": items,
@@ -116,113 +96,41 @@
       }
       function searchByLatLng(lat, lng) {
         $("#example").hide();
-        $("#game").show();
-
+        $(".loading").show();
         $.getJSON( " http://104.236.108.140:3000/licenses/" + lat + "/" + lng, function( data ) {
           $("#example").show();
-          $("#game").hide();
+        
           var items = [];
-          var headers = [
-            'license_id',
-            'source_system',
-            'call_sign',
-            'radio_service_description',
-            'rollup_status_description',
-            'lic_address',
-            'lic_city',
-            'contact_company',
-            'ant_type_desc'
-          ]
+
 
           for (var x = 0; x < data.data.length; x++) {
             var row = []
-            row.push(data.data[x].license_id)
-            row.push(data.data[x].source_system)
-            row.push(data.data[x].lic_address)
-            row.push(data.data[x].lic_city)
-            row.push(data.data[x].contact_company)
-            row.push(data.data[x].ant_type_desc)
+            row.push(data.data[x].lic_name)
+            row.push(data.data[x].radio_service_desc)
+            row.push(data.data[x].rollup_category_code)
+            row.push(data.data[x].frequency_assigned)
             items.push(row)
           }
 
           addData(items)
         });
       }
-    </script>
-    <script>
-    var userOption = undefined;
-    function playWith(option){
-       // first, we deselect the previous selected element (if exist)
-       if (userOption != undefined)
-       {
-          userSelectionElement = document.getElementById(userOption);
-          // we remove the purple border (if exist)
-          userSelectionElement.style.border = "5px #F8F8F8  solid";
-       }
-       // then, we select the user option and we add
-       // a purple border
-       userOption = option;
-       userSelectionElement = document.getElementById(option);
-       userSelectionElement.style.border = "5px #990066 solid";
-    }
-    function playGame(){
-      var computerOption = Math.random();
-      if (computerOption <0.34){
-      computerOption = "stone";
-      }else if(computerOption <=0.67){
-      computerOption = "paper";
-      }else{
-      computerOption = "scissor";
+
+      var x = document.getElementById("example");
+      function getLocation() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(showPosition);
+          } else {
+              x.innerHTML = "Geolocation is not supported by this browser.";
+          }
       }
-
-      resultMessage = compare(userOption, computerOption);
-
-      document.getElementById("result").innerHTML =
-      "<br><br><br><br><h4>User select: " + userOption + " - Computer select:"
-      + computerOption + "</h4> <h2>" + resultMessage + "</h2>";
-
-    }
-
-    function compare(userSelection, computerSelection)
-		{
-			if(userSelection == undefined)
-			{
-				return "Please, select an option before play"
-			}
-
-		    if (userSelection == computerSelection)
-		    {
-		       return "It is a draw!";
-		    }
-
-		    if (userSelection == "stone")
-		    {
-		        if (computerSelection == "scissor")
-		        {
-		             return "You win!";
-		        } else {
-		            return "The computer wins. Try again.";
-		        }
-
-		    } else if (userSelection == "paper") {
-
-		        if (computerSelection == "stone")
-		        {
-		             return "You win!" ;
-		        } else if("scissor") {
-		            return "The computer wins. Try again." ;
-		        }
-
-		    } else if (userSelection == "scissor") {
-
-		        if (computerSelection == "stone")
-		        {
-		            return "The computer wins. Try again.";
-		        }else{
-		            return "You win!";
-		        }
-		    }
-		}
+      function showPosition(position) {
+         searchByLatLng(position.coords.latitude,position.coords.longitude)
+      }
+          
+      getLocation(); 
+           
     </script>
+
   </body>
 </html>
